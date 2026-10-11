@@ -1,0 +1,59 @@
+<!--
+  首頁內容（放進 main 的部分）。
+  頁首、頁尾、字型與 head 由 scripts/build.mjs 統一產生；
+  下列標記會在 build 時被置換：
+    @emblem 註解    金色徽章 SVG（環形文字、刻度、火花）
+    @apps 註解      作品區（依 data/apple-catalog.json 產生）
+    data-app-count  作品數量
+  修改後請執行：node scripts/build.mjs
+-->
+<section class="hero" aria-labelledby="hero-title">
+  <div class="wrap hero-grid">
+    <div class="hero-copy reveal">
+      <p class="eyebrow"><span class="eyebrow-rule" aria-hidden="true"></span>Independent App Studio</p>
+      <h1 id="hero-title">讓每一點靈感，<br>走進日常。</h1>
+      <p class="hero-lead">把腦海裡的小小火花，<br>做成生活裡用得到、喜歡用的 App。</p>
+      <div class="hero-actions">
+        <a class="button" href="#apps">探索我們的 App <span aria-hidden="true">→</span></a>
+        <a class="text-link" href="#about">認識花火工作室</a>
+      </div>
+      <p class="hero-meta"><span class="num" data-app-count>11</span> 款作品 <span class="dot" aria-hidden="true">·</span> App Store 上架中 <span class="dot" aria-hidden="true">·</span> 獨立創作</p>
+    </div>
+    <figure class="emblem reveal" role="img" aria-label="Sparkori 花火工作室徽章：金色火花置於刻度圓環中央">
+      <!-- @emblem -->
+      <figcaption class="emblem-caption" aria-hidden="true"><span>Ideas take shape</span><span>A little spark, every day</span></figcaption>
+    </figure>
+  </div>
+</section>
+
+<div class="word-band" aria-hidden="true">
+  <div class="wrap"><span>小小靈感</span><i></i><span>日常可能</span><i></i><span>用心製作</span><i></i><span class="latin">Little ideas, real things</span></div>
+</div>
+
+<!-- @apps -->
+
+<section id="about" class="about" aria-labelledby="about-title">
+  <div class="wrap about-grid">
+    <div class="about-intro reveal">
+      <p class="eyebrow">The Studio / 關於我們</p>
+      <h2 id="about-title">從一點火花，<br>到一個作品。</h2>
+      <p>Sparkori 花火工作室是一個獨立 App 創作品牌。<br>我們想把對生活的好奇，放進每一次設計與開發裡。</p>
+    </div>
+    <ol class="principles reveal">
+      <li><span class="index num">01</span><div><h3>從日常出發</h3><p>留意生活裡的小需求，讓每個點子都有值得被做出來的理由。</p></div></li>
+      <li><span class="index num">02</span><div><h3>把細節做好</h3><p>清楚的介面、順手的操作，讓使用 App 成為輕鬆自然的事。</p></div></li>
+      <li><span class="index num">03</span><div><h3>保持好奇</h3><p>給新的想法一些空間，持續探索作品可以帶來的不同可能。</p></div></li>
+    </ol>
+  </div>
+</section>
+
+<section class="closing" aria-labelledby="closing-title">
+  <div class="wrap">
+    <div class="closing-card frame reveal">
+      <span class="closing-spark" aria-hidden="true"><svg viewBox="0 0 64 64" fill="currentColor"><path d="M32 9l5 16 15-7-9 14 12 9-18-2-5 17-5-17-18 2 12-9-9-14 15 7z"/></svg></span>
+      <p class="eyebrow">Made with curiosity</p>
+      <h2 id="closing-title">讓靈感，綻放成日常。</h2>
+      <a class="text-link" href="/support/">使用上有疑問？與我們聯絡 <span aria-hidden="true">→</span></a>
+    </div>
+  </div>
+</section>
