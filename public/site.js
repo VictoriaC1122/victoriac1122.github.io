@@ -39,6 +39,8 @@ if ('IntersectionObserver' in window && !reduceMotion) {
     }
   }, { rootMargin: '0px 0px -6% 0px', threshold: 0.06 });
   targets.forEach((el) => io.observe(el));
+  // 保險：若觀察器沒有觸發（例如分頁在背景載入），幾秒後仍把內容顯示出來
+  setTimeout(() => targets.forEach((el) => el.classList.add('is-in')), 4000);
 } else {
   targets.forEach((el) => el.classList.add('is-in'));
 }
