@@ -12,6 +12,8 @@ const catalog = JSON.parse(await read('data/apple-catalog.json'));
 const policies = JSON.parse(await read('data/privacy-sources/manifest.json')).apps;
 const email = 'victoriacheng1122@gmail.com';
 const compiledOn = '2026 年 10 月 12 日';
+// 部署在子路徑時（例如 GitHub 專案頁 /repo-name/）設定 BASE_PATH；根網域或自訂網域留空。
+const base = (process.env.BASE_PATH || '').trim().replace(/\/+$/, '');
 const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
 // --------------------------------------------------------------------------
@@ -31,7 +33,8 @@ const shortNames = {
 };
 const order = ['dream-journal', 'design-it', 'perfect-pig', 'time-manager', 'vitamins', 'easy-draw', 'compound-calculator', 'stock-simulator', 'crypto-dictionary', 'pr-diary', 'larry-cocktail'];
 const apps = [...catalog.apps].sort((a, b) => order.indexOf(a.slug) - order.indexOf(b.slug));
-const appURL = (a) => `/apps/${a.slug}/`;
+// 作品頁放在 /app/，避免與 GitHub Pages 上名為 apps 的專案站（/apps/）路徑衝突
+const appURL = (a) => `/app/${a.slug}/`;
 const policyURL = (a) => `${appURL(a)}privacy/`;
 const mailto = (subject = 'Sparkori 支援與聯絡') => `mailto:${email}?subject=${encodeURIComponent(subject)}`;
 const pad = (n) => String(n).padStart(2, '0');
@@ -45,7 +48,9 @@ const header = `<a class="skip-link" href="#main">跳到主要內容</a><header 
 const footer = `<footer class="site-footer"><div class="wrap footer-grid"><div class="footer-brand">${brand}<p>把腦海裡的小小火花，<br>做成生活裡用得到、喜歡用的 App。</p></div><nav class="footer-col" aria-label="頁尾導覽"><p class="footer-title">Explore</p><div class="footer-nav"><a href="/#apps">作品</a><a href="/#about">關於花火</a><a href="/support/">支援與聯絡</a></div></nav><nav class="footer-col" aria-label="隱私資訊"><p class="footer-title">Privacy</p><div class="footer-nav"><a href="/privacy/">App 隱私政策</a><a href="/website-privacy/">網站隱私說明</a></div></nav></div><div class="wrap footer-bottom"><span>© 2026 Sparkori · 花火工作室</span><span>獨立創作 · 用心製作</span></div></footer>`;
 
 function page(title, description, content) {
-  return `<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="description" content="${esc(description)}"><meta name="theme-color" content="#f5f1e8"><meta property="og:type" content="website"><meta property="og:title" content="${esc(title)}"><meta property="og:description" content="${esc(description)}"><meta property="og:site_name" content="Sparkori 花火工作室"><title>${esc(title)}</title><link rel="icon" href="/favicon.svg" type="image/svg+xml">${fonts}<link rel="stylesheet" href="/style.css"><script src="/site.js" defer></script></head><body>${header}<main id="main">${content}</main>${footer}</body></html>`;
+  const html = `<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="description" content="${esc(description)}"><meta name="theme-color" content="#f5f1e8"><meta property="og:type" content="website"><meta property="og:title" content="${esc(title)}"><meta property="og:description" content="${esc(description)}"><meta property="og:site_name" content="Sparkori 花火工作室"><title>${esc(title)}</title><link rel="icon" href="/favicon.svg" type="image/svg+xml">${fonts}<link rel="stylesheet" href="/style.css"><script src="/site.js" defer></script></head><body>${header}<main id="main">${content}</main>${footer}</body></html>`;
+  // 站內絕對路徑（href="/..."、src="/..."）加上 BASE_PATH 前綴
+  return base ? html.replace(/\b(href|src)="\/(?!\/)/g, `$1="${base}/`) : html;
 }
 async function save(path, content) {
   const file = resolve(root, 'public', path);
@@ -133,7 +138,7 @@ for (const [i, a] of apps.entries()) {
   const others = [1, 2, 3].map((k) => apps[(i + k) % apps.length]);
   const spec = `<dl class="spec-list reveal"><div><dt>類別</dt><dd>${esc(a.genres.join(' · '))}</dd></div><div><dt>系統需求</dt><dd>iOS ${esc(a.minimumOsVersion)} 或以上</dd></div><div><dt>年齡分級</dt><dd>${esc(a.contentRating)}</dd></div><div><dt>開發者</dt><dd>${esc(a.artistName)}</dd></div></dl>`;
   const content = `<div class="wrap">${breadcrumb(esc(shortNames[a.slug]))}<section class="app-intro"><div class="app-hero-icon-wrap reveal"><img class="app-hero-icon" src="${a.iconPath}" alt="${esc(shortNames[a.slug])}圖示" width="144" height="144"></div><div class="app-intro-copy reveal"><p class="eyebrow">${categories[a.slug]} / No. ${pad(i + 1)}</p><h1>${esc(a.nameZhHant)}</h1><p class="lead">${esc(a.shortDescription)}</p><div class="actions"><a class="button" href="${a.storeUrl}">在 App Store 查看 <span aria-hidden="true">↗</span></a><a class="text-link" href="${policyURL(a)}">${p.policyStatus === 'website_only_privacy' ? '隱私資訊' : '隱私政策'} <span aria-hidden="true">→</span></a></div></div></section>${spec}<section class="app-support"><div class="app-support-copy reveal"><p class="eyebrow">Good to know / 使用資訊</p><h2>下載、支援與隱私。</h2><p>功能、系統需求、價格及 App 內購買項目，請以 App Store 的最新說明為準。</p><div class="info-links"><a class="text-link" href="${policyURL(a)}">閱讀隱私資訊 <span aria-hidden="true">→</span></a><a class="text-link" href="/support/">支援與常見問題 <span aria-hidden="true">→</span></a></div></div>${contactBox(a)}</section></div><section class="more-apps"><div class="wrap"><div class="section-heading reveal"><div><p class="eyebrow">More from Sparkori / 更多作品</p><h2>再看看其他的花火。</h2></div></div><div class="resource-list reveal">${appRows('app', others)}</div></div></section>`;
-  await save(`apps/${a.slug}/index.html`, page(`${a.nameZhHant}｜Sparkori 花火工作室`, a.shortDescription, content));
+  await save(`app/${a.slug}/index.html`, page(`${a.nameZhHant}｜Sparkori 花火工作室`, a.shortDescription, content));
 
   const original = await read(`data/privacy-sources/${p.policyTextFile}`);
   const text = original.replaceAll('victoriacheeng1122@gmail.com', email);
@@ -144,7 +149,7 @@ for (const [i, a] of apps.entries()) {
     ? `<div class="policy-note"><strong>現有說明的適用範圍</strong><p>以下是原作品公開資訊頁的隱私說明，僅涵蓋該網頁，未完整說明 App 內的資料處理。若你需要了解 App 的資料、儲存或刪除方式，請透過下方信箱聯絡我們。</p></div>`
     : `<div class="policy-note"><p>以下沿用此 App 既有的隱私政策。原文提及舊支援網站、GitHub Pages 或字型服務時，指的是原網站；本 Sparkori 官網的資料處理請見<a href="/website-privacy/">網站隱私說明</a>。</p>${a.slug === 'compound-calculator' ? `<p>本頁聯絡信箱已統一更新為 ${email}。</p>` : ''}</div>`;
   const privacyContent = `<div class="wrap reading-wrap">${breadcrumb('隱私資訊', crumbLink(appURL(a), esc(shortNames[a.slug])))}<header class="page-heading"><p class="eyebrow">Privacy / 隱私資訊</p><h1>${esc(shortNames[a.slug])}<br>${p.policyStatus === 'website_only_privacy' ? '隱私資訊' : '隱私權政策'}</h1><p class="lead">${esc(p.policyUpdatedText || '依既有公開政策內容整理')}</p></header>${notice}<article class="policy-body">${blocks}</article><div class="policy-source"><p><a href="${esc(p.policySourceURL)}">查看原政策頁面 ↗</a></p><p>隱私或資料問題：<a href="${mailto(`${shortNames[a.slug]}｜隱私問題`)}">${email}</a></p><p class="small">彙整日期：${compiledOn}</p></div></div>`;
-  await save(`apps/${a.slug}/privacy/index.html`, page(`${shortNames[a.slug]}隱私資訊｜Sparkori`, `${a.nameZhHant}的隱私政策與聯絡方式。`, privacyContent));
+  await save(`app/${a.slug}/privacy/index.html`, page(`${shortNames[a.slug]}隱私資訊｜Sparkori`, `${a.nameZhHant}的隱私政策與聯絡方式。`, privacyContent));
 }
 
 // --------------------------------------------------------------------------
